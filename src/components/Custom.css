@@ -1,0 +1,22 @@
+.custom-editor .cm-scroller {
+    scrollbar-width: thin; /* Makes scrollbar thinner */
+    scrollbar-color: #4b5563 #1f2937; /* Thumb (gray) | Track (darker gray) */
+  }
+  
+  /* For WebKit-based browsers (Chrome, Edge, Safari) */
+  .custom-editor .cm-scroller::-webkit-scrollbar {
+    width: 8px; /* Adjust scrollbar width */
+  }
+  
+  .custom-editor .cm-scroller::-webkit-scrollbar-thumb {
+    background: #4b5563; /* Gray thumb */
+    border-radius: 14px; /* Round the edges */
+  }
+  
+  .custom-editor .cm-scroller::-webkit-scrollbar-track {
+    background: #1f2937; /* Dark background */
+  }
+  
+
+
+ 
