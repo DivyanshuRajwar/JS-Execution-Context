@@ -18,5 +18,8 @@
   }
   
 
-
+  .custom-scroller {
+    scrollbar-width: thin; /* Makes scrollbar thinner */
+    scrollbar-color: #4b5563 #1f2937; /* Thumb (gray) | Track (darker gray) */
+  }
  

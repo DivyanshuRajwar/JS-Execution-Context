@@ -13,9 +13,11 @@ function ExecuteEngine({
   setCodeExecution,
   setFunctionCall,
   setUpdatedMemory,
+  isPausedRef,
+  setFunctionName
 }) {
   const [executionInProgress, setExecutionInProgress] = useState(false);
-  const isPausedRef = useRef(false);
+  
 
   const delay = (ms) => {
     return new Promise((resolve) => {
@@ -63,12 +65,12 @@ function ExecuteEngine({
         GEC: "Global execution context is created and pushed",
       });
       const logs = [];
-      logs.push("Code execution started...");
+      logs.push("Code Execution Started...");
       setLogs([...logs]);
       setCallStackUpdate({ ...callStack });
       await delay(2000);
 
-      logs.push("Memory Allocation Phase...");
+      logs.push("🔹 Phase 1: Memory Allocation");
       setLogs([...logs]);
       await delay(2000);
 
@@ -96,11 +98,11 @@ function ExecuteEngine({
               type: varType,
               value: varType === "var" ? "undefined" : "TDZ",
             };
+            setMemoryBlock({ ...memoryBlock }); // Update state with the latest object
 
-            logs.push(`Allocated memory for variable: ${varName}`);
+            logs.push(`  - Allocated memory for variable:  ${varName}`);
             setLogs([...logs]);
 
-            setMemoryBlock({ ...memoryBlock }); // Update state with the latest object
 
             // ✅ Correct way to update `updatedMemory` without overwriting
             setUpdatedMemory((prev) => ({
@@ -141,7 +143,7 @@ function ExecuteEngine({
               [funcName]: memoryBlock.global.functions[funcName], // Add new variable
             }));
 
-            logs.push(`Function stored in memory: ${funcName}`);
+            logs.push(`  - Allocated memory for function: ${funcName}`);
             setLogs([...logs]);
 
             await delay(2000);
@@ -149,18 +151,20 @@ function ExecuteEngine({
         }
       }
       logs.push(
-        "Phase one -> Memory allocation is completed. Press Continue to start Phase 2."
-      );
+        "🔹Phase 1 Completed."
+      ); 
+      logs.push(
+         `Press "Continue" to proceed to Phase 2.`
+      ); 
       setLogs([...logs]);
       isPausedRef.current = true;
       setPhase(2);
-      console.log(memoryBlock);
     }
     if (phase === 2) {
       const codeExeLogs = [];
       setLogs((prevLogs) => [
         ...prevLogs,
-        "Phase 2 started - Code Execution Phase",
+        "🔹 Phase 2: Code Execution",
       ]);
       await delay(2000);
 
@@ -170,14 +174,12 @@ function ExecuteEngine({
         while (isPausedRef.current) await delay(500);
       
         if (!trimmedLine || trimmedLine.startsWith("//")) continue;
-        // // codeExeLogs.push(trimmedLine);
-        // ✅ Detect function calls
         const funcCallMatch = trimmedLine.match(/^([a-zA-Z_$][\w$]*)\s*\(/);
         if (trimmedLine.startsWith("function")) {
           const funcName = trimmedLine.split(" ")[1]?.split("(")[0]?.trim();
           setLogs((prevLogs) => [
             ...prevLogs,
-            `Skipping function definition: ${funcName}`,
+            `  - Skipping function declaration: ${funcName}`,
           ]);
       
           // ✅ Jump to the last line of the function
@@ -188,6 +190,7 @@ function ExecuteEngine({
             if (braceCount === 0) break;
             i++; // Move to the last line of the function
           }
+          await delay(2000)
           continue;
         } else if (funcCallMatch) {
           const funcName = funcCallMatch[1];
@@ -195,18 +198,15 @@ function ExecuteEngine({
           if (memoryBlock.global?.functions?.[funcName]) {
             setLogs((prevLogs) => [
               ...prevLogs,
-              `Function call found: ${funcName}()`,
+              `  - Function call detected: ${funcName}()`,
             ]);
             codeExeLogs.push(`${funcName}()`);
-            const funData = {
-              [funcName]: {
-                funBody: memoryBlock.global.functions[funcName].body,
-              },
-            };
+            
             setCodeExecution([...codeExeLogs]);
+            setFunctionName(funcName);
             setFunctionCall(true);
+            await delay(2000);
             continue;
-            // await delay(2000);
           } else {
             setLogs((prevLogs) => [
               ...prevLogs,
@@ -255,12 +255,13 @@ function ExecuteEngine({
               ]);
               setLogs((prevLogs) => [
                 ...prevLogs,
-                `Console ${consoleType}: ${evaluatedOutputs.join(" ")}`,
+                // `Console ${consoleType}: ${evaluatedOutputs.join(" ")}`,
+                `  - Console Output: ${evaluatedOutputs.join(" ")}`,
               ]);
             } catch (error) {
               setLogs((prevLogs) => [
                 ...prevLogs,
-                `Error in console.${consoleType}: ${error.message}`,
+                `- Error in console.${consoleType}: ${error.message}`,
               ]);
             }
             // await delay(2000);
@@ -296,7 +297,7 @@ function ExecuteEngine({
               
               setLogs((prevLogs) => [
                 ...prevLogs,
-                `Variable declared: ${varName} = ${evaluatedValue}`,
+                `  - Assigned value to variable: ${varName} = ${evaluatedValue}`,
               ]);
             
               setMemoryBlock(updatedMemoryBlock);
@@ -304,14 +305,14 @@ function ExecuteEngine({
             } catch (error) {
               setLogs((prevLogs) => [
                 ...prevLogs,
-                `Error in evaluating ${varName}: ${error.message}`,
+                `  - Error in evaluating ${varName}: ${error.message}`,
               ]);
             }
              
           } else {
             setLogs((prevLogs) => [
               ...prevLogs,
-              `Syntax error in variable declaration: ${trimmedLine}`,
+              `  - Syntax error in variable declaration: ${trimmedLine}`,
             ]);
           }
         }
@@ -322,10 +323,15 @@ function ExecuteEngine({
 
       setLogs((prevLogs) => [
         ...prevLogs,
-        "Phase 2 -> Code execution completed.",
+        "🔹 Phase 2 Completed.",
+      ]);
+      await delay(1000)
+      setLogs((prevLogs) => [
+        ...prevLogs,
+        `🔚 End of Program. Code Execution Finished.`,
       ]);
     }
-
+    
     setExecutionInProgress(false);
   }, [
     code,
@@ -353,9 +359,11 @@ function ExecuteEngine({
       setConsoleUpdate([]);
       setCodeExecution([]);
       setMemoryBlock([]);
+
       setCallStackUpdate({
         GEC: "Global execution context is created and pushed",
       });
+      setUpdatedMemory([]);
       isPausedRef.current = false;
       setExecutionInProgress(false);
       setPhase(1);

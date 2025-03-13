@@ -11,9 +11,9 @@ function CallStack({ CallStackUpdate }) {
   }, [CallStackUpdate]);
 
   return (
-    <div className="w-[40%] h-full border rounded-lg flex flex-col items-center bg-[#0a1f44] p-2">
-      <h2 className="text-white text-lg font-semibold mb-2">Call Stack</h2>
-      <div className="w-[80%] h-[80%] border-2 border-gray-300 rounded-xl relative overflow-hidden flex flex-col-reverse">
+    <div className="w-[35%] h-full border rounded-lg flex flex-col items-center bg-[#2d2d2d] ">
+      <h2 className="text-white text-lg font-semibold mt-2 mb-2">Call Stack</h2>
+      <div className="w-full h-[90%] border border-gray-300 rounded-lg overflow-hidden flex flex-col-reverse bg-[#212121] ">
         <AnimatePresence>
           {stack.map((item, index) => (
             <motion.div
@@ -22,7 +22,7 @@ function CallStack({ CallStackUpdate }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="w-full bg-blue-500 text-white text-center font-bold p-2 rounded-md border border-white shadow-md mb-2"
+              className="w-full text-xl bg-gray-800 text-white text-center font-bold p-2 rounded-lg border border-gray-700 shadow-md mb-2"
             >
               {item}
             </motion.div>
