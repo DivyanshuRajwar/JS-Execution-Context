@@ -1,7 +1,7 @@
 import React, { useEffect, useState ,useRef } from "react";
 import "./Custom.css";
 import FunctionExecutionContext from "./FunctionExecutionContext";
-import { pre } from "framer-motion/m";
+import { data, pre } from "framer-motion/m";
 
 function ExecutionContext({
   memoryBlock,
@@ -14,7 +14,8 @@ function ExecutionContext({
   setCallStackUpdate,
   setLogs,
   setConsoleUpdate,
-  functionName
+  functionName,
+  setCallStackterminal
 }) {
   const [codeLog, setCodeLog] = useState([]);
   const [executionIndex, setExecutionIndex] = useState(0);
@@ -58,13 +59,21 @@ function ExecutionContext({
         setConsoleUpdate={setConsoleUpdate}
         updatedMemory={updatedMemory}
         functionName={functionName}
-        setOnComplete={()=>{isPausedRef.current = false}}
+        setOnComplete={()=>{isPausedRef.current = false
+          // setCallStackUpdate((prev) => {
+          //   const newStack = { ...prev };
+          //   delete newStack.FEC; // Removing the last pushed "FEC"
+          //   return newStack;
+          // });
+          setCallStackterminal((prev) => ({
+            ...prev,
+            [Date.now()]: "Function Execution Context is popped"
+          }));
+        }}
+        setCallStackUpdate={setCallStackUpdate}
       />]);
       resetFunctionCall(); // Mark FunctionCall as false after adding
-      setCallStackUpdate((prev) => ({
-        ...prev,
-        FEC: "Function Execution Context is created and pushed"
-      }));
+      setCallStackUpdate((prev) => [...prev, "FEC"]); 
       isPausedRef.current = true
     }
   }, [FunctionCall, resetFunctionCall]);

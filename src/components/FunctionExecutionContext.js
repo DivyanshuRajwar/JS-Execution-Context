@@ -7,6 +7,7 @@ const FunctionExecutionContext = ({
   updatedMemory,
   functionName,
   setOnComplete,
+  setCallStackUpdate
 }) => {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -272,7 +273,7 @@ const FunctionExecutionContext = ({
       ...prevLogs,
       `Function Execution Completed: ${functionName}`,
     ]);
-  
+    setCallStackUpdate((prev) => prev.slice(0, -1)); 
     setOnComplete();
   };
   

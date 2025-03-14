@@ -14,7 +14,8 @@ function ExecuteEngine({
   setFunctionCall,
   setUpdatedMemory,
   isPausedRef,
-  setFunctionName
+  setFunctionName,
+  setCallStackterminal
 }) {
   const [executionInProgress, setExecutionInProgress] = useState(false);
   
@@ -57,17 +58,20 @@ function ExecuteEngine({
     if (executionInProgress) return;
     setExecutionInProgress(true);
     isPausedRef.current = false;
-    const callStack = { GEC: "Global execution context is created and pushed" };
+    // const callStack = { GEC: "Global execution context is created and pushed" };
     if (phase === 1) {
       setLogs([]);
       // setMemoryBlock({});
-      setCallStackUpdate({
-        GEC: "Global execution context is created and pushed",
-      });
+      setCallStackUpdate((prev) => [...prev, "GEC"]); 
+
+      setCallStackterminal((prev) => ({
+        ...prev,
+        [Date.now()]: "Global execution context is created and pushed"
+      }));
+      
       const logs = [];
       logs.push("Code Execution Started...");
       setLogs([...logs]);
-      setCallStackUpdate({ ...callStack });
       await delay(2000);
 
       logs.push("🔹 Phase 1: Memory Allocation");
@@ -194,7 +198,7 @@ function ExecuteEngine({
           continue;
         } else if (funcCallMatch) {
           const funcName = funcCallMatch[1];
-      
+          
           if (memoryBlock.global?.functions?.[funcName]) {
             setLogs((prevLogs) => [
               ...prevLogs,
@@ -204,6 +208,10 @@ function ExecuteEngine({
             
             setCodeExecution([...codeExeLogs]);
             setFunctionName(funcName);
+            setCallStackterminal((prev) => ({
+              ...prev,
+              [Date.now()]: "Function execution context is created and pushed"
+            }));      
             setFunctionCall(true);
             await delay(2000);
             continue;
@@ -330,6 +338,11 @@ function ExecuteEngine({
         ...prevLogs,
         `🔚 End of Program. Code Execution Finished.`,
       ]);
+      setCallStackterminal((prev) => ({
+        ...prev,
+        [Date.now()]: "Global Execution Context is popped"
+      }));
+      setCallStackUpdate((prev) => prev.slice(0, -1)); 
     }
     
     setExecutionInProgress(false);
@@ -359,10 +372,7 @@ function ExecuteEngine({
       setConsoleUpdate([]);
       setCodeExecution([]);
       setMemoryBlock([]);
-
-      setCallStackUpdate({
-        GEC: "Global execution context is created and pushed",
-      });
+      setCallStackUpdate((prev) => [...prev, "GEC"]); 
       setUpdatedMemory([]);
       isPausedRef.current = false;
       setExecutionInProgress(false);

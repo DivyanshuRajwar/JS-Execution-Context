@@ -2,7 +2,7 @@ import React from 'react'
 import ExecutionContext from './ExecutionContext'
 import PlaybackControls from './PlaybackControls'
 
-function TopRight({setControlAction, memoryBlock,  phase,codeExecution, FunctionCall,resetFunctionCall , updatedMemory , isPausedRef,setCallStackUpdate,setLogs,setConsoleUpdate,functionName}) {
+function TopRight({setControlAction, memoryBlock,  phase,codeExecution, FunctionCall,resetFunctionCall , updatedMemory , isPausedRef,setCallStackUpdate,setLogs,setConsoleUpdate,functionName , setCallStackterminal}) {
   return (
     <div className="w-full h-full flex flex-col items-center justify-between  ">
       <div className=' w-full flex  '>
@@ -23,6 +23,7 @@ function TopRight({setControlAction, memoryBlock,  phase,codeExecution, Function
               setLogs={setLogs}
               setConsoleUpdate={setConsoleUpdate}
               functionName={functionName}
+              setCallStackterminal={setCallStackterminal}
            />
             <PlaybackControls setControlAction={setControlAction} />
 

@@ -21,6 +21,7 @@ function Wrapper() {
   const [updatedMemory, setUpdatedMemory] = useState({});
   const [controlAction, setControlAction] = useState(null);
   const [CallStackUpdate, setCallStackUpdate] = useState([]);
+  const [callStackTerminal , setCallStackterminal] = useState({})
   const [codeExecution, setCodeExecution] = useState([]);
   const [phase, setPhase] = useState(1);
   const [consoleUpdate, setConsoleUpdate] = useState([]);
@@ -53,6 +54,7 @@ function Wrapper() {
             setLogs={setLogs}
             setConsoleUpdate={setConsoleUpdate}
             functionName={functionName}
+            setCallStackterminal={setCallStackterminal}
           />
         </div>
       </div>
@@ -62,7 +64,7 @@ function Wrapper() {
         {/* Call Stack and Terminal */}
         <div className="h-full w-[50%]    flex gap-1 ">
           <CallStack CallStackUpdate={CallStackUpdate} />
-          <StackTerminal CallStackUpdate={CallStackUpdate} />
+          <StackTerminal callStackTerminal={callStackTerminal} />
         </div>
         {/* Terminal and Console */}
         <div className="h-full w-[50%] flex  gap-1 ">
@@ -87,6 +89,7 @@ function Wrapper() {
         setUpdatedMemory={setUpdatedMemory}
         isPausedRef={isPausedRef}
         setFunctionName={setFunctionName}
+        setCallStackterminal={setCallStackterminal}
       />
     </div>
   );
