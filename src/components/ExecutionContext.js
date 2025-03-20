@@ -1,7 +1,8 @@
-import React, { useEffect, useState ,useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./Custom.css";
 import FunctionExecutionContext from "./FunctionExecutionContext";
 import { data, pre } from "framer-motion/m";
+import { FaArrowsRotate } from "react-icons/fa6";
 
 function ExecutionContext({
   memoryBlock,
@@ -15,77 +16,95 @@ function ExecutionContext({
   setLogs,
   setConsoleUpdate,
   functionName,
-  setCallStackterminal
+  setCallStackterminal,
+  controlAction,
 }) {
   const [codeLog, setCodeLog] = useState([]);
   const [executionIndex, setExecutionIndex] = useState(0);
-    const memoryRef = useRef(null);
-    const codeRef = useRef(null);
-  
-    useEffect(() => {
-      if (memoryRef.current) {
-        memoryRef.current.scrollTo({
-          top: memoryRef.current.scrollHeight,
-          behavior: "smooth", // Enables smooth scrolling
-        });
-      }
-    }, [updatedMemory]);
-    useEffect(() => {
-      if (codeRef.current) {
-        codeRef.current.scrollTo({
-          top: codeRef.current.scrollHeight,
-          behavior: "smooth", // Enables smooth scrolling
-        });
-      }
-    }, [codeLog]);
+  const memoryRef = useRef(null);
+  const codeRef = useRef(null);
+  useEffect(() => {
+    if (controlAction === "Reset") {
+      setCodeLog([]);
+    }
+  }, [controlAction]);
+  useEffect(() => {
+    if (memoryRef.current) {
+      memoryRef.current.scrollTo({
+        top: memoryRef.current.scrollHeight,
+        behavior: "smooth", // Enables smooth scrolling
+      });
+    }
+  }, [updatedMemory]);
+  useEffect(() => {
+    if (codeRef.current) {
+      codeRef.current.scrollTo({
+        top: codeRef.current.scrollHeight,
+        behavior: "smooth", // Enables smooth scrolling
+      });
+    }
+  }, [codeLog]);
 
-  
-  
   // Effect to add codeExecution logs one by one
   useEffect(() => {
     if (codeExecution.length > 0 && executionIndex < codeExecution.length) {
-      
-        setCodeLog((prevLog) => [...prevLog, codeExecution[executionIndex]]);
-        setExecutionIndex((prevIndex) => prevIndex + 1); }
+      setCodeLog((prevLog) => [...prevLog, codeExecution[executionIndex]]);
+      setExecutionIndex((prevIndex) => prevIndex + 1);
+    }
   }, [executionIndex, codeExecution]);
 
   // Effect to add FunctionExecutionContext when FunctionCall is true
   useEffect(() => {
     if (FunctionCall) {
-      setCodeLog((prevLog) => [...prevLog, 
-      <FunctionExecutionContext 
-        key={prevLog.length}
-        setLogs={setLogs}
-        setConsoleUpdate={setConsoleUpdate}
-        updatedMemory={updatedMemory}
-        functionName={functionName}
-        setOnComplete={()=>{isPausedRef.current = false
-          // setCallStackUpdate((prev) => {
-          //   const newStack = { ...prev };
-          //   delete newStack.FEC; // Removing the last pushed "FEC"
-          //   return newStack;
-          // });
-          setCallStackterminal((prev) => ({
-            ...prev,
-            [Date.now()]: "Function Execution Context is popped"
-          }));
-        }}
-        setCallStackUpdate={setCallStackUpdate}
-      />]);
+      setCodeLog((prevLog) => [
+        ...prevLog,
+        <FunctionExecutionContext
+          key={prevLog.length}
+          setLogs={setLogs}
+          setConsoleUpdate={setConsoleUpdate}
+          updatedMemory={updatedMemory}
+          functionName={functionName}
+          setOnComplete={() => {
+            isPausedRef.current = false;
+            setCallStackterminal((prev) => ({
+              ...prev,
+              [Date.now()]: "Function Execution Context is popped",
+            }));
+          }}
+          setCallStackUpdate={setCallStackUpdate}
+        />,
+      ]);
       resetFunctionCall(); // Mark FunctionCall as false after adding
-      setCallStackUpdate((prev) => [...prev, "FEC"]); 
-      isPausedRef.current = true
+      setCallStackUpdate((prev) => [...prev, "FEC"]);
+      isPausedRef.current = true;
     }
   }, [FunctionCall, resetFunctionCall]);
+  const [memoryBoxName, setmemoryName] = useState("Memory");
+  const [codeBoxName, setcodeName] = useState("Code Execution");
 
   return (
     <div className="w-[85%] h-full flex flex-col  bg-[#212121]">
       <div className="w-full h-full flex">
         {/* Memory Block */}
         <div className="w-[40%] h-full border  rounded-bl-lg p-4">
-          <h2 className="text-white text-lg font-semibold">Memory</h2>
+          <div className=" flex gap-2 items-center ">
+            <h2 className="text-white text-lg font-semibold">
+              {memoryBoxName}
+            </h2>
+            <FaArrowsRotate
+            className=" hover:cursor-pointer "
+              onClick={() =>
+                setmemoryName((prev) =>
+                  prev === "Memory" ? "Variable Environment" : "Memory"
+                )
+              }
+            />
+          </div>
           <hr className="border-gray-500 my-2" />
-          <div ref={memoryRef} className="text-gray-300 text-lg overflow-y-auto h-[225px] ">
+          <div
+            ref={memoryRef}
+            className="text-gray-300 text-lg overflow-y-auto h-[225px] "
+          >
             {Object.keys(updatedMemory).length > 0 ? (
               <ul className="list-disc pl-4">
                 {Object.entries(updatedMemory).map(
@@ -109,16 +128,33 @@ function ExecutionContext({
 
         {/* Code Execution */}
         <div className="w-[60%] h-full border  rounded-r-lg p-4">
-          <h2 className="text-white text-lg font-semibold">
-            Code Execution (Phase {phase})
-          </h2>
+          <div className=" flex gap-2 items-center ">
+            <h2 className="text-white text-lg font-semibold">{codeBoxName}</h2>
+            <FaArrowsRotate
+            className=" hover:cursor-pointer "
+              onClick={() =>
+                setcodeName((prev) =>
+                  prev === "Code Execution"
+                    ? "Thread of Execution"
+                    : "Code Execution"
+                )
+              }
+            />
+          </div>
           <hr className="border-gray-500 my-2" />
-          <div ref={codeRef} className="w-full h-[88%] overflow-y-auto text-gray-300 text-lg custom-scroller ">
+          <div
+            ref={codeRef}
+            className="w-full h-[88%] overflow-y-auto text-gray-300 text-lg custom-scroller "
+          >
             {codeLog.length > 0 ? (
               <ul className="list-none pl-2">
                 {codeLog.map((log, index) => (
                   <li key={index} className="mb-1">
-                    {React.isValidElement(log) ? log : <span className="text-cyan-400">→ {log}</span>}
+                    {React.isValidElement(log) ? (
+                      log
+                    ) : (
+                      <span className="text-cyan-400">→ {log}</span>
+                    )}
                   </li>
                 ))}
               </ul>

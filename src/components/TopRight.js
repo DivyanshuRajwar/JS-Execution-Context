@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ExecutionContext from './ExecutionContext'
 import PlaybackControls from './PlaybackControls'
 
-function TopRight({setControlAction, memoryBlock,  phase,codeExecution, FunctionCall,resetFunctionCall , updatedMemory , isPausedRef,setCallStackUpdate,setLogs,setConsoleUpdate,functionName , setCallStackterminal}) {
+function TopRight({setControlAction, memoryBlock,  phase,codeExecution, FunctionCall,resetFunctionCall , updatedMemory , isPausedRef,setCallStackUpdate,setLogs,setConsoleUpdate,functionName , setCallStackterminal,controlAction}) {
   return (
     <div className="w-full h-full flex flex-col items-center justify-between  ">
       <div className=' w-full flex  '>
-        <h2 className="text-xl font-bold mt-2 ml-[240px] ">Execution Context</h2>
-        <h2 className="text-xl font-bold mt-2 ml-[430px] ">Playback </h2>
+        <h2 className="text-xl font-bold mt-2 ml-[200px] ">Execution Context (Phase {phase}) </h2>
+        <h2 className="text-xl font-bold mt-2 ml-[380px] ">Playback </h2>
 
       </div>
         <div className="w-full  h-[85%] flex   ">
@@ -24,6 +24,7 @@ function TopRight({setControlAction, memoryBlock,  phase,codeExecution, Function
               setConsoleUpdate={setConsoleUpdate}
               functionName={functionName}
               setCallStackterminal={setCallStackterminal}
+              controlAction={controlAction}
            />
             <PlaybackControls setControlAction={setControlAction} />
 

@@ -6,7 +6,7 @@ function CallStack({ CallStackUpdate }) {
 
   useEffect(() => {
     if (CallStackUpdate) {
-      setStack(Object.values(CallStackUpdate)); // Use Object.values() to get the values of the object
+      setStack(Object.values(CallStackUpdate));
     }
   }, [CallStackUpdate]);
 
@@ -14,10 +14,11 @@ function CallStack({ CallStackUpdate }) {
     <div className="w-[35%] h-full border-2 rounded-lg flex flex-col items-center bg-[#2d2d2d]">
       <h2 className="text-white text-lg font-semibold mt-2 mb-2">Call Stack</h2>
       <div className="w-full h-[90%] border border-gray-300 rounded-lg overflow-hidden flex flex-col-reverse bg-[#212121]">
+        {stack.length>0 ? ("") :(<div className="mb-[110%] flex ml-3 w-full h-4 text-gray-500">Call Stack is empty </div>) }
         <AnimatePresence>
           {stack.map((item, index) => (
             <motion.div
-              key={index} // Use index as the key for animation
+              key={index}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}

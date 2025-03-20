@@ -45,12 +45,12 @@ function ExecuteEngine({
           }
           return variableData.value;
         }
-        return `undefined`; // Variable is not defined
+        return `undefined`;
       });
 
       return new Function(`"use strict"; return (${safeExpression})`)();
     } catch (error) {
-      return error.message; // Return error message instead of throwing
+      return error.message;
     }
   }
 
@@ -58,15 +58,13 @@ function ExecuteEngine({
     if (executionInProgress) return;
     setExecutionInProgress(true);
     isPausedRef.current = false;
-    // const callStack = { GEC: "Global execution context is created and pushed" };
     if (phase === 1) {
       setLogs([]);
-      // setMemoryBlock({});
       setCallStackUpdate((prev) => [...prev, "GEC"]); 
 
       setCallStackterminal((prev) => ({
         ...prev,
-        [Date.now()]: "Global execution context is created and pushed"
+        [Date.now()]: "Global Execution context is created and pushed"
       }));
       
       const logs = [];
@@ -78,12 +76,10 @@ function ExecuteEngine({
       setLogs([...logs]);
       await delay(2000);
 
-      const lines = code.split("\n"); // Splitting the code into lines
-
+      const lines = code.split("\n");
       for (let i = 0; i < lines.length; i++) {
         let trimmedLine = lines[i].trim();
-        while (isPausedRef.current) await delay(500); // Pause if needed
-        // ✅ Handling variable declarations
+        while (isPausedRef.current) await delay(500); 
         if (
           trimmedLine.startsWith("var") ||
           trimmedLine.startsWith("let") ||
@@ -102,19 +98,16 @@ function ExecuteEngine({
               type: varType,
               value: varType === "var" ? "undefined" : "TDZ",
             };
-            setMemoryBlock({ ...memoryBlock }); // Update state with the latest object
+            setMemoryBlock({ ...memoryBlock }); 
 
             logs.push(`  - Allocated memory for variable:  ${varName}`);
             setLogs([...logs]);
-
-
-            // ✅ Correct way to update `updatedMemory` without overwriting
             setUpdatedMemory((prev) => ({
-              ...prev, // Keep existing values
-              [varName]: memoryBlock.global.variables[varName], // Add new variable
+              ...prev, 
+              [varName]: memoryBlock.global.variables[varName], 
             }));
 
-            await delay(2000); // Simulate step-by-step execution
+            await delay(2000); 
           }
         } else if (trimmedLine.startsWith("function")) {
           const funcName = trimmedLine.split(" ")[1]?.split("(")[0]?.trim();
@@ -122,19 +115,15 @@ function ExecuteEngine({
             let funcBody = "";
             let braceCount = 0;
             let startIndex = i;
-
-            // Collect full function body (multi-line)
             while (i < lines.length) {
               funcBody += lines[i] + "\n";
-
-              // Track opening and closing braces
               braceCount += (lines[i].match(/{/g) || []).length;
               braceCount -= (lines[i].match(/}/g) || []).length;
 
               if (braceCount === 0) {
-                break; // Stop when function body closes
+                break; 
               }
-              i++; // Move to next line
+              i++;
             }
 
             memoryBlock.global.functions[funcName] = {
@@ -143,8 +132,8 @@ function ExecuteEngine({
             };
             setMemoryBlock({ ...memoryBlock });
             setUpdatedMemory((prev) => ({
-              ...prev, // Keep existing values
-              [funcName]: memoryBlock.global.functions[funcName], // Add new variable
+              ...prev,
+              [funcName]: memoryBlock.global.functions[funcName], 
             }));
 
             logs.push(`  - Allocated memory for function: ${funcName}`);
@@ -185,14 +174,12 @@ function ExecuteEngine({
             ...prevLogs,
             `  - Skipping function declaration: ${funcName}`,
           ]);
-      
-          // ✅ Jump to the last line of the function
           let braceCount = 0;
           while (i < lines.length) {
             if (lines[i].includes("{")) braceCount++;
             if (lines[i].includes("}")) braceCount--;
             if (braceCount === 0) break;
-            i++; // Move to the last line of the function
+            i++; 
           }
           await delay(2000)
           continue;
@@ -225,7 +212,7 @@ function ExecuteEngine({
           codeExeLogs.push(trimmedLine);
           const consoleMatch = trimmedLine.match(/console\.(log|warn|error)\((.*)\);?$/);
           if (consoleMatch) {
-            const consoleType = consoleMatch[1]; // log, warn, error
+            const consoleType = consoleMatch[1]; 
             let consoleExpression = consoleMatch[2].trim();
       
             try {
@@ -243,7 +230,7 @@ function ExecuteEngine({
                 } else {
                   try {
                     if (/[+\-*/%<>!=&|^]/.test(exp)) {
-                      return evalExpression(exp, memoryBlock); // ✅ Evaluate expressions
+                      return evalExpression(exp, memoryBlock);
                     } else {
                       let variableData = memoryBlock?.global?.variables?.[exp.trim()];
                       if (!variableData) return `${exp} is not defined`;
@@ -272,7 +259,6 @@ function ExecuteEngine({
                 `- Error in console.${consoleType}: ${error.message}`,
               ]);
             }
-            // await delay(2000);
           }
         } else if (/^(var|let|const)\s+[a-zA-Z_$][\w$]*\s*=/.test(trimmedLine)) {
           const declarationMatch = trimmedLine.match(/(var|let|const)\s+([a-zA-Z_$][\w$]*)\s*=\s*(.+?);?$/);
@@ -284,22 +270,21 @@ function ExecuteEngine({
             try {
               let evaluatedValue = evalExpression(valueExpression, memoryBlock);
               
-              // ✅ Create a new copy of memoryBlock
+             
               const updatedMemoryBlock = { ...memoryBlock };
             
-              // ✅ Update the variable while preserving type
               updatedMemoryBlock.global.variables = { 
                 ...updatedMemoryBlock.global.variables,
                 [varName]: { 
-                  ...(updatedMemoryBlock.global.variables[varName] || { type: "let" }), // Preserve `type`
+                  ...(updatedMemoryBlock.global.variables[varName] || { type: "let" }), 
                   value: evaluatedValue 
                 }
               };
               setUpdatedMemory((prev) => ({
                 ...prev, // Preserve existing state
                 [varName]: { 
-                  ...(prev[varName] || { type: "let" }), // Preserve type if it exists
-                  value: evaluatedValue, // Update value
+                  ...(prev[varName] || { type: "let" }), 
+                  value: evaluatedValue, 
                 }
               }));
               
@@ -323,6 +308,7 @@ function ExecuteEngine({
               `  - Syntax error in variable declaration: ${trimmedLine}`,
             ]);
           }
+          // await delay(800)
         }
         setCodeExecution([...codeExeLogs]);
         await delay(2000)
@@ -372,8 +358,10 @@ function ExecuteEngine({
       setConsoleUpdate([]);
       setCodeExecution([]);
       setMemoryBlock([]);
-      setCallStackUpdate((prev) => [...prev, "GEC"]); 
+      setCallStackUpdate([]); 
       setUpdatedMemory([]);
+      setCodeExecution([]);
+      setCallStackterminal({})
       isPausedRef.current = false;
       setExecutionInProgress(false);
       setPhase(1);

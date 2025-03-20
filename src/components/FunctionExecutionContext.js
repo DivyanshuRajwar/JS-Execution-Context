@@ -20,19 +20,15 @@ const FunctionExecutionContext = ({
 
   function evalExpression(expression, functionMemory) {
     try {
-      // Trim whitespace and remove trailing semicolons
+      
       expression = expression.trim().replace(/;$/, "");
-      // Check if expression is a simple value (number, string, boolean)
+     
       if (/^(\d+(\.\d+)?|true|false|null|'[^']*'|"[^"]*")$/.test(expression)) {
-        return eval(expression); // Directly return primitive values
+        return eval(expression); 
       }
-
-      // Replace variables with their values from functionMemory
       let safeExpression = expression.replace(/\b[a-zA-Z_]\w*\b/g, (match) => {
         if (functionMemory.hasOwnProperty(match)) {
           let variableData = functionMemory[match];
-
-          // Handle TDZ (Temporal Dead Zone) properly
           if (variableData.value === "TDZ") {
             throw new Error(
               `ReferenceError: Cannot access '${match}' before initialization`
@@ -44,29 +40,24 @@ const FunctionExecutionContext = ({
 
         throw new Error(`ReferenceError: '${match}' is not defined`);
       });
-
-      // Evaluate the final expression safely
       return new Function(`"use strict"; return (${safeExpression})`)();
     } catch (error) {
-      return error.message; // Return error message instead of throwing
+      return error.message; 
     }
   }
-  //code
   useEffect(() => {
     let fullCode = updatedMemory[functionName]?.body?.toString() || "";
-    let match = fullCode.match(/\{([\s\S]*)\}/); // Extract function body inside {}
+    let match = fullCode.match(/\{([\s\S]*)\}/);
     let functionBody = match ? match[1].trim() : "";
 
     setCode(functionBody);
-    setIsCodeReady(true); // Set flag after code is updated
+    setIsCodeReady(true);
   }, [functionName, updatedMemory]);
-  //phase1
   useEffect(() => {
     if (isCodeReady) {
       executePhaseOne();
     }
   }, [isCodeReady]);
-  //phase 2
   useEffect(() => {
     if (phase === 2) {
       executePhaseTwo();
@@ -102,7 +93,7 @@ const FunctionExecutionContext = ({
             type: varType,
             value: varType === "var" ? "undefined" : "TDZ",
           };
-          setFunctionMemory({ ...functionMemory }); // Sync UI
+          setFunctionMemory({ ...functionMemory }); 
           setLogs((prevLogs) => [
             ...prevLogs,
             `-- Allocated memory for variable: ${varName}`,
@@ -147,8 +138,7 @@ const FunctionExecutionContext = ({
   const executePhaseTwo = async () => {
     const lines = code.split("\n");
     let codeExeLogs = [];
-    let updatedFunctionMemory = { ...functionMemory }; // Clone memory for updates
-  
+    let updatedFunctionMemory = { ...functionMemory }; 
     setLogs((prevLogs) => [
       ...prevLogs,
       `Phase 2 of ${functionName}: Code Execution Started`,
@@ -168,7 +158,7 @@ const FunctionExecutionContext = ({
           if (lines[i].includes("{")) braceCount++;
           if (lines[i].includes("}")) braceCount--;
           if (braceCount === 0) break;
-          i++; // Move to function end
+          i++; 
         }
         setLogs((prevLogs) => [...prevLogs, `-- Skipping function declaration`]);
         await delay(2000);
@@ -197,10 +187,9 @@ const FunctionExecutionContext = ({
             newValue = varType === "var" ? undefined : "TDZ";
           }
   
-          // ✅ Correctly update the function memory
           updatedFunctionMemory[varName] = { type: varType, value: newValue };
   
-          setFunctionMemory({ ...updatedFunctionMemory }); // Update state
+          setFunctionMemory({ ...updatedFunctionMemory }); 
           setLogs((prevLogs) => [
             ...prevLogs,
             `-- Assigned value to variable: ${varName} = ${newValue}`,
@@ -229,7 +218,7 @@ const FunctionExecutionContext = ({
             let evaluatedOutputs = expressions.map((exp) => {
               exp = exp.trim();
   
-              if (/^['"`].*['"`]$/.test(exp)) return exp.slice(1, -1); // Remove quotes
+              if (/^['"`].*['"`]$/.test(exp)) return exp.slice(1, -1); 
               if (exp === "true") return true;
               if (exp === "false") return false;
               if (exp === "null") return null;

@@ -4,21 +4,24 @@ function ExecutionTerminal({ logs }) {
   const terminalRef = useRef(null);
 
   useEffect(() => {
+    console.log(logs)
     if (terminalRef.current) {
-      terminalRef.current.scrollTo({
-        top: terminalRef.current.scrollHeight,
-        behavior: "smooth", // Enables smooth scrolling
-      });
+      setTimeout(() => { 
+        terminalRef.current.scrollTo({
+          top: terminalRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100); 
     }
-  }, [logs]); // Runs whenever logs update
+  }, [logs]); 
 
   return (
     <div
-      ref={terminalRef}
-      className="w-[60%] h-[100%]  bg-[#2d2d2d]  border rounded-lg flex flex-col items-center "
+      
+      className="w-[60%] h-[100%] bg-[#2d2d2d] border rounded-lg flex flex-col items-center"
     >
       <h3 className="text-white text-lg mt-2 font-semibold">Execution Terminal</h3>
-      <div className=" p-2 w-full h-[90%] overflow-y-auto  bg-[#212121] border rounded-lg ">
+      <div ref={terminalRef} className="p-2 w-full h-[90%] overflow-y-auto bg-[#212121] border rounded-lg pb-2 ">
         {logs.length === 0 ? (
           <p className="text-gray-400">No execution logs...</p>
         ) : (
