@@ -6,7 +6,6 @@ import Console from "./ConsoleCompo";
 import CallStack from "./CallStack";
 import StackTerminal from "./StackTerminal";
 import ExecuteEngine from "./ExecuteEngine";
-import { use } from "framer-motion/m";
 function Wrapper() {
   const [code, setCode] = useState("// Write your JavaScript code here...");
   const [logs, setLogs] = useState([]); 
