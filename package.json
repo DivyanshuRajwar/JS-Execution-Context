@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@uiw/codemirror-theme-vscode": "^4.23.8",
     "@uiw/react-codemirror": "^4.23.8",
+    "framer-motion": "^12.5.0",
     "react": "^19.0.0",
     "react-console-emulator": "^5.0.2",
     "react-dom": "^19.0.0",
